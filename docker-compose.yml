@@ -1,0 +1,20 @@
+version: '3.1'
+
+services:
+
+  web:
+    build: ./docker/web
+    environment:
+      - APACHE_RUN_USER=#1000
+    volumes:
+      - ${WEB_ROOT_PATH}:/var/www/html/
+    ports:
+      - ${WEB_PORT}:80
+    working_dir: ${WEB_WORKING_DIR}
+
+  composer:
+    image: composer:1.6
+    volumes:
+      - ${WEB_ROOT_PATH}:/var/www/html/
+    working_dir: ${WEB_WORKING_DIR}
+    command: composer update --ignore-platform-reqs

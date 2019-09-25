@@ -9,19 +9,22 @@ namespace app\models;
  */
 class GeneratorService
 {
-    private $_createTableDtos;
     private $_generatorParams;
+    private $_createTableDtos;
+    private $_insertDataDtos;
 
     /**
      * GeneratorService constructor.
      *
-     * @param CreateTableDto[] $createTableDtos
      * @param GeneratorParams $generatorParams
+     * @param CreateTableDto[] $createTableDtos
+     * @param InsertDataDto[] $insertDataDtos
      */
-    public function __construct(array $createTableDtos, GeneratorParams $generatorParams)
+    public function __construct(GeneratorParams $generatorParams, array $createTableDtos = [], array $insertDataDtos = [])
     {
         $this->_createTableDtos = $createTableDtos;
         $this->_generatorParams = $generatorParams;
+        $this->_insertDataDtos = $insertDataDtos;
     }
 
     public function sort()
@@ -49,6 +52,16 @@ class GeneratorService
         foreach ($this->_createTableDtos as $createTableDto) {
             $createTableGenerator = new CreateTableGenerator(
                 $createTableDto,
+                $this->_generatorParams->getDirectory(),
+                $this->_generatorParams->getFileExtension()
+            );
+
+            $createTableGenerator->createFile($this->_generatorParams->getFramework());
+        }
+
+        foreach ($this->_insertDataDtos as $insertDataDto) {
+            $createTableGenerator = new InsertDataGenerator(
+                $insertDataDto,
                 $this->_generatorParams->getDirectory(),
                 $this->_generatorParams->getFileExtension()
             );

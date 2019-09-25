@@ -28,6 +28,11 @@ class GeneratorParams
     private $_framework = self::YII_2;
 
     /**
+     * @var array
+     */
+    private $_dataTables = [];
+
+    /**
      * @return string
      */
     public function getDirectory(): string
@@ -73,5 +78,21 @@ class GeneratorParams
     public function setFramework(int $framework): void
     {
         $this->_framework = $framework;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDataTables(): array
+    {
+        return $this->_dataTables;
+    }
+
+    /**
+     * @param array $dataTables
+     */
+    public function setDataTables(array $dataTables): void
+    {
+        $this->_dataTables = $dataTables;
     }
 }

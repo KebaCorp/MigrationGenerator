@@ -20,8 +20,11 @@ class GeneratorService
      * @param CreateTableDto[] $createTableDtos
      * @param InsertDataDto[] $insertDataDtos
      */
-    public function __construct(GeneratorParams $generatorParams, array $createTableDtos = [], array $insertDataDtos = [])
-    {
+    public function __construct(
+        GeneratorParams $generatorParams,
+        array $createTableDtos = [],
+        array $insertDataDtos = []
+    ) {
         $this->_createTableDtos = $createTableDtos;
         $this->_generatorParams = $generatorParams;
         $this->_insertDataDtos = $insertDataDtos;
@@ -49,10 +52,16 @@ class GeneratorService
 
     public function generate()
     {
+        $date = date('ymd_His');
+        $count = 0;
+
         foreach ($this->_createTableDtos as $createTableDto) {
+            ++$count;
+
             $createTableGenerator = new CreateTableGenerator(
                 $createTableDto,
                 $this->_generatorParams->getDirectory(),
+                "{$date}_{$count}",
                 $this->_generatorParams->getFileExtension()
             );
 
@@ -60,9 +69,12 @@ class GeneratorService
         }
 
         foreach ($this->_insertDataDtos as $insertDataDto) {
+            ++$count;
+
             $createTableGenerator = new InsertDataGenerator(
                 $insertDataDto,
                 $this->_generatorParams->getDirectory(),
+                "{$date}_{$count}",
                 $this->_generatorParams->getFileExtension()
             );
 

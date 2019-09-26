@@ -10,5 +10,5 @@ namespace app\models;
 class InsertDataDto
 {
     public $tableName;
-    public $insertDataQuery;
+    public $data;
 }

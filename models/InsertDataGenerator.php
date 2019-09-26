@@ -15,14 +15,16 @@ class InsertDataGenerator
     private $_fileName;
     private $_fileExtension;
 
-    public function __construct(InsertDataDto $insertDataDto, string $directory, string $fileExtension = 'php')
-    {
+    public function __construct(
+        InsertDataDto $insertDataDto,
+        string $directory,
+        string $prefix,
+        string $fileExtension = 'php'
+    ) {
         $this->_insertDataDto = $insertDataDto;
         $this->_directory = $directory;
         $this->_fileExtension = $fileExtension;
-
-        $time = time();
-        $this->_fileName = "m{$time}_insert_into_table__{$this->_insertDataDto->tableName}";
+        $this->_fileName = "m{$prefix}_insert_into_table__{$this->_insertDataDto->tableName}";
     }
 
     public function getFileName()
@@ -35,6 +37,34 @@ class InsertDataGenerator
      */
     public function getYii1FileContent(): string
     {
+        $insertQuery = '';
+        $isFirstData = true;
+
+        foreach ($this->_insertDataDto->data as $datum) {
+            if ($isFirstData) {
+                $isFirstData = false;
+            } else {
+                $insertQuery .= "\n\n";
+            }
+
+            $insertQuery .= <<<INSERT
+        \$this->insert('{$this->_insertDataDto->tableName}', [
+INSERT;
+            $insertQuery .= "\n";
+
+            foreach ($datum as $name => $value) {
+                $normalizedValue = is_numeric($value) ? $value : "'{$value}'";
+
+                $insertQuery .= <<<COLUMNS
+            '{$name}' => {$normalizedValue},
+COLUMNS;
+                $insertQuery .= "\n";
+            }
+
+            $insertQuery .= <<<INSERT
+        ]);
+INSERT;
+        }
 
         $fileContent = <<<MIGRATION
 <?php
@@ -49,14 +79,7 @@ class {$this->getFileName()} extends CDbMigration
      */
     public function safeUp()
     {
-        try {
-            Yii::app()->db->createCommand('{$this->_insertDataDto->insertDataQuery}')->execute();
-        } catch (\Exception \$e) {
-            echo \$e->getTraceAsString();
-            return false;
-        }
-        
-        return true;
+{$insertQuery}
     }
 
     /**
@@ -64,14 +87,7 @@ class {$this->getFileName()} extends CDbMigration
      */
     public function safeDown()
     {
-        try {
-            Yii::app()->db->createCommand('DROP TABLE `{$this->_insertDataDto->tableName}`')->execute();
-        } catch (\Exception \$e) {
-            echo \$e->getTraceAsString();
-            return false;
-        }
-        
-        return true;
+        \$this->truncateTable('{$this->_insertDataDto->tableName}');
     }
 }
 
@@ -85,6 +101,34 @@ MIGRATION;
      */
     public function getYii2FileContent(): string
     {
+        $insertQuery = '';
+        $isFirstData = true;
+
+        foreach ($this->_insertDataDto->data as $datum) {
+            if ($isFirstData) {
+                $isFirstData = false;
+            } else {
+                $insertQuery .= "\n\n";
+            }
+
+            $insertQuery .= <<<INSERT
+        \$this->insert('{$this->_insertDataDto->tableName}', [
+INSERT;
+            $insertQuery .= "\n";
+
+            foreach ($datum as $name => $value) {
+                $normalizedValue = is_numeric($value) ? $value : "'{$value}'";
+
+                $insertQuery .= <<<COLUMNS
+            '{$name}' => {$normalizedValue},
+COLUMNS;
+                $insertQuery .= "\n";
+            }
+
+            $insertQuery .= <<<INSERT
+        ]);
+INSERT;
+        }
 
         $fileContent = <<<MIGRATION
 <?php
@@ -101,14 +145,7 @@ class {$this->getFileName()} extends Migration
      */
     public function safeUp()
     {
-        try {
-            Yii::\$app->db->createCommand('{$this->_insertDataDto->insertDataQuery}')->execute();
-        } catch (\Exception \$e) {
-            echo \$e->getTraceAsString();
-            return false;
-        }
-        
-        return true;
+{$insertQuery}
     }
 
     /**
@@ -116,14 +153,7 @@ class {$this->getFileName()} extends Migration
      */
     public function safeDown()
     {
-        try {
-            Yii::\$app->db->createCommand('DROP TABLE `{$this->_insertDataDto->tableName}`')->execute();
-        } catch (\Exception \$e) {
-            echo \$e->getTraceAsString();
-            return false;
-        }
-        
-        return true;
+        \$this->truncateTable('{$this->_insertDataDto->tableName}');
     }
 }
 

@@ -29,7 +29,7 @@ class SiteController extends Controller
         // Generator params
         $generatorParams = new GeneratorParams();
         $generatorParams->setDirectory('../migrations');
-        $generatorParams->setFramework(GeneratorParams::YII_2);
+        $generatorParams->setFramework(GeneratorParams::YII_1);
         $generatorParams->setDataTables([
             'menu',
         ]);
@@ -64,10 +64,11 @@ class SiteController extends Controller
                 }
 
                 if (in_array($table, $generatorParams->getDataTables())) {
-                    if ($insertDataQuery = $this->makeRecoveryData($db, $table)) {
+                    if ($data = $this->getDataFromTable($db, $table)) {
+
                         $insertDataDto = new InsertDataDto();
                         $insertDataDto->tableName = $table;
-                        $insertDataDto->insertDataQuery = $insertDataQuery;
+                        $insertDataDto->data = $data;
 
                         $insertDataDtos[] = $insertDataDto;
                     }
@@ -82,39 +83,19 @@ class SiteController extends Controller
         return $this->render('index');
     }
 
-    public function makeRecoveryData(Connection $db, string $table)
+    /**
+     * Gets data from table.
+     *
+     * @param Connection $db
+     * @param string $table
+     * @return array|null
+     */
+    public function getDataFromTable(Connection $db, string $table): ?array
     {
-        if ($data = $db->createCommand("SELECT * FROM `{$table}`")->queryAll()) {
-
-            $insertQuery = "INSERT INTO `{$table}_1`";
-            $columns = '';
-            $values = [];
-
-            $isFirstRow = true;
-            foreach ($data as $datum) {
-
-                $columnValues = [];
-                $rowValues = [];
-                foreach ($datum as $column => $value) {
-                    if ($isFirstRow) {
-                        $columnValues[] = "`$column`";
-                    }
-                    $rowValues[] = "'$value'";
-                }
-
-                if ($isFirstRow) {
-                    $columns = implode(',', $columnValues);
-                }
-                $values[] = '(' . implode(',', $rowValues) . ')';
-
-                $isFirstRow = false;
-            }
-
-            $values = implode(',', $values);
-
-            return "{$insertQuery} ({$columns}) VALUES {$values};";
+        try {
+            return $db->createCommand("SELECT * FROM `{$table}`")->queryAll();
+        } catch (\yii\db\Exception $e) {
+            return null;
         }
-
-        return null;
     }
 }

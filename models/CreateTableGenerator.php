@@ -15,14 +15,16 @@ class CreateTableGenerator
     private $_fileName;
     private $_fileExtension;
 
-    public function __construct(CreateTableDto $createTableDto, string $directory, string $fileExtension = 'php')
-    {
+    public function __construct(
+        CreateTableDto $createTableDto,
+        string $directory,
+        string $prefix,
+        string $fileExtension = 'php'
+    ) {
         $this->_createTableDto = $createTableDto;
         $this->_directory = $directory;
         $this->_fileExtension = $fileExtension;
-
-        $time = time();
-        $this->_fileName = "m{$time}_create_table__{$this->_createTableDto->tableName}";
+        $this->_fileName = "m{$prefix}_create_table__{$this->_createTableDto->tableName}";
     }
 
     public function getFileName()
@@ -50,7 +52,7 @@ class {$this->getFileName()} extends CDbMigration
     public function safeUp()
     {
         try {
-            Yii::app()->db->createCommand('{$this->_createTableDto->createTableQuery}')->execute();
+            Yii::app()->db->createCommand("{$this->_createTableDto->createTableQuery}")->execute();
         } catch (\Exception \$e) {
             echo \$e->getTraceAsString();
             return false;
@@ -102,7 +104,7 @@ class {$this->getFileName()} extends Migration
     public function safeUp()
     {
         try {
-            Yii::\$app->db->createCommand('{$this->_createTableDto->createTableQuery}')->execute();
+            Yii::\$app->db->createCommand("{$this->_createTableDto->createTableQuery}")->execute();
         } catch (\Exception \$e) {
             echo \$e->getTraceAsString();
             return false;

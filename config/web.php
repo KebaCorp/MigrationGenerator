@@ -4,7 +4,7 @@ $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
 $config = [
-    'id'         => 'basic',
+    'id'         => env('APP_ID', 'kebacorp/migrationgenerator'),
     'basePath'   => dirname(__DIR__),
     'bootstrap'  => ['log'],
     'aliases'    => [
@@ -13,7 +13,10 @@ $config = [
     ],
     'components' => [
         'request'      => [
-            'cookieValidationKey' => 'a_s2df1sdfsFS_D641klodssdC4dsv5lsvld',
+            'cookieValidationKey' => env(
+                'COOKIE_VALIDATION_KEY',
+                'sslgfG<LFDG5-dsf5LR_g98fdsglfA<L$sdfEDM5FAMWKEREE544yRGL<:g8'
+            ),
         ],
         'cache'        => [
             'class' => yii\caching\FileCache::class,

@@ -3,14 +3,14 @@
 namespace app\models;
 
 /**
- * Class GeneratorService.
+ * Class GeneratorParams.
  *
  * @package app\models
  */
 class GeneratorParams
 {
-    const YII_1 = 1;
-    const YII_2 = 2;
+    const FRAMEWORK_YII_1 = 1;
+    const FRAMEWORK_YII_2 = 2;
 
     /**
      * @var string
@@ -25,7 +25,7 @@ class GeneratorParams
     /**
      * @var int
      */
-    private $_framework = self::YII_2;
+    private $_framework = self::FRAMEWORK_YII_2;
 
     /**
      * @var array

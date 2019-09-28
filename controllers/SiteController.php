@@ -4,8 +4,8 @@ namespace app\controllers;
 
 use app\models\CreateTableDto;
 use app\models\GeneratorParams;
-use app\models\GeneratorService;
 use app\models\InsertDataDto;
+use app\models\mysql\MigrationGenerator;
 use Exception;
 use PDO;
 use Yii\db\Connection;
@@ -28,22 +28,22 @@ class SiteController extends Controller
     {
         // Generator params
         $generatorParams = new GeneratorParams();
-        $generatorParams->setDirectory('../migrations');
-        $generatorParams->setFramework(GeneratorParams::YII_1);
+        $generatorParams->setDirectory('../migrations2');
+        $generatorParams->setFramework(GeneratorParams::FRAMEWORK_YII_1);
         $generatorParams->setDataTables([
-            'menu',
+            'feedback_type',
         ]);
 
         // Database connection params
         $dbHost = 'mysql';
-        $dbPort = '3306';
+        $dbPort = '3309';
         $dbName = 'db_mysql_00000000_migration_generator_local';
         $dbUser = 'root';
         $dbPassword = 'rootexample';
         $dbCharset = 'utf8';
 
         $db = new Connection([
-            'dsn'      => "mysql:host={$dbHost};port={$dbPort};dbname={$dbName}",
+            'dsn'      => "mysql:host={$dbHost};dbname={$dbName}",
             'username' => $dbUser,
             'password' => $dbPassword,
             'charset'  => $dbCharset,
@@ -75,9 +75,8 @@ class SiteController extends Controller
                 }
             }
 
-            $generatorService = new GeneratorService($generatorParams, $createTableDtos, $insertDataDtos);
-            $generatorService->sort();
-            $generatorService->generate();
+            $generator = new MigrationGenerator($generatorParams, $createTableDtos, $insertDataDtos);
+            $generator->generate();
         }
 
         return $this->render('index');

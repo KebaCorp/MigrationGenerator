@@ -7,14 +7,24 @@ services:
     environment:
       - APACHE_RUN_USER=#1000
     volumes:
-      - ${WEB_ROOT_PATH}:/var/www/html/
+      - .:/var/www/html/
     ports:
-      - ${WEB_PORT}:80
-    working_dir: ${WEB_WORKING_DIR}
+      - 8088:80
+    working_dir: /var/www/html/
 
   composer:
     image: composer:1.6
     volumes:
-      - ${WEB_ROOT_PATH}:/var/www/html/
-    working_dir: ${WEB_WORKING_DIR}
+      - .:/var/www/html/
+    working_dir: /var/www/html/
     command: composer update --ignore-platform-reqs
+
+  mysql:
+    image: mysql:5.7
+    restart: ${MYSQL_RESTART}
+    volumes:
+      - ${MYSQL_PATH}:/var/lib/mysql
+    ports:
+      - ${MYSQL_PORT}:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}

@@ -14,7 +14,7 @@ use yii\helpers\ArrayHelper;
  */
 class GeneratorForm extends Model
 {
-    public $directory = '../migrations3';
+    public $directory = '../migrations';
     public $framework = GeneratorParams::FRAMEWORK_YII_2;
     public $tables = [];
     public $dataTables = [];

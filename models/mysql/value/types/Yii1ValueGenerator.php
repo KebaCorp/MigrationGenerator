@@ -57,57 +57,57 @@ class Yii1ValueGenerator implements GeneratorInterface
             }
 
             $insertQuery .= <<<INSERT
-        \$this->insert(\$this->_tableName, [
-INSERT;
+                        \$this->insert(\$this->_tableName, [
+                INSERT;
             $insertQuery .= "\n";
 
             foreach ($datum as $name => $value) {
                 $normalizedValue = is_numeric($value) ? $value : "'{$value}'";
 
                 $insertQuery .= <<<COLUMNS
-            '{$name}' => {$normalizedValue},
-COLUMNS;
+                                '{$name}' => {$normalizedValue},
+                    COLUMNS;
                 $insertQuery .= "\n";
             }
 
             $insertQuery .= <<<INSERT
-        ]);
-INSERT;
+                        ]);
+                INSERT;
         }
 
         $fileContent = <<<MIGRATION
-<?php
-
-/**
- * Class {$this->getFileName()}.
- */
-class {$this->getFileName()} extends CDbMigration
-{
-    /**
-     * Table name.
-     *
-     * @var string
-     */
-    private \$_tableName = '{$this->_insertDataDto->tableName}';
-    
-    /**
-     * {@inheritdoc}
-     */
-    public function safeUp()
-    {
-{$insertQuery}
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function safeDown()
-    {
-        \$this->truncateTable(\$this->_tableName);
-    }
-}
-
-MIGRATION;
+            <?php
+            
+            /**
+             * Class {$this->getFileName()}.
+             */
+            class {$this->getFileName()} extends CDbMigration
+            {
+                /**
+                 * Table name.
+                 *
+                 * @var string
+                 */
+                private \$_tableName = '{$this->_insertDataDto->tableName}';
+                
+                /**
+                 * {@inheritdoc}
+                 */
+                public function safeUp()
+                {
+            {$insertQuery}
+                }
+            
+                /**
+                 * {@inheritdoc}
+                 */
+                public function safeDown()
+                {
+                    \$this->truncateTable(\$this->_tableName);
+                }
+            }
+            
+            MIGRATION;
 
         return $fileContent;
     }

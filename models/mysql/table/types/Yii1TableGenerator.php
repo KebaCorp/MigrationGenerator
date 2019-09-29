@@ -48,45 +48,45 @@ class Yii1TableGenerator implements GeneratorInterface
         $createTableQuery = addcslashes($this->_createTableDto->createTableQuery, '"');
 
         $fileContent = <<<MIGRATION
-<?php
-
-/**
- * Class {$this->getFileName()}.
- */
-class {$this->getFileName()} extends CDbMigration
-{
-    /**
-     * Table name.
-     *
-     * @var string
-     */
-    private \$_tableName = '{$this->_createTableDto->tableName}';
-    
-    /**
-     * {@inheritdoc}
-     */
-    public function safeUp()
-    {
-        try {
-            Yii::app()->db->createCommand("{$createTableQuery}")->execute();
-        } catch (\Exception \$e) {
-            echo \$e->getTraceAsString();
-            return false;
-        }
-        
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function safeDown()
-    {
-        \$this->dropTable(\$this->_tableName);
-    }
-}
-
-MIGRATION;
+            <?php
+            
+            /**
+             * Class {$this->getFileName()}.
+             */
+            class {$this->getFileName()} extends CDbMigration
+            {
+                /**
+                 * Table name.
+                 *
+                 * @var string
+                 */
+                private \$_tableName = '{$this->_createTableDto->tableName}';
+                
+                /**
+                 * {@inheritdoc}
+                 */
+                public function safeUp()
+                {
+                    try {
+                        Yii::app()->db->createCommand("{$createTableQuery}")->execute();
+                    } catch (\Exception \$e) {
+                        echo \$e->getTraceAsString();
+                        return false;
+                    }
+                    
+                    return true;
+                }
+            
+                /**
+                 * {@inheritdoc}
+                 */
+                public function safeDown()
+                {
+                    \$this->dropTable(\$this->_tableName);
+                }
+            }
+            
+            MIGRATION;
 
         return $fileContent;
     }

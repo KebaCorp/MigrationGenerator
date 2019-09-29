@@ -105,8 +105,6 @@ class GeneratorForm extends Model
                 [
                     'directory',
                     'framework',
-                    'tables',
-                    'dataTables',
                     'dbHost',
                     'dbPort',
                     'dbName',
@@ -115,6 +113,11 @@ class GeneratorForm extends Model
                     'dbCharset',
                 ],
                 'required'
+            ],
+            [
+                ['tables', 'dataTables'],
+                'each',
+                'rule' => ['string'],
             ],
         ];
     }
@@ -139,6 +142,17 @@ class GeneratorForm extends Model
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function afterValidate()
+    {
+        $this->tables = $this->tables ?: [];
+        $this->dataTables = $this->dataTables ?: [];
+
+        parent::afterValidate();
+    }
+
+    /**
      * Returns database connection.
      *
      * @return Connection
@@ -150,7 +164,7 @@ class GeneratorForm extends Model
                 'dsn'      => "mysql:host={$this->dbHost};port={$this->dbPort};dbname={$this->dbName}",
                 'username' => $this->dbUser,
                 'password' => $this->dbPassword,
-                'charset' => $this->dbCharset,
+                'charset'  => $this->dbCharset,
             ]);
         }
 

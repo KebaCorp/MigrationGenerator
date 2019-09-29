@@ -70,7 +70,6 @@ class SiteController extends Controller
             $generatorParams = new GeneratorParams();
             $generatorParams->setDirectory($generatorForm->directory);
             $generatorParams->setFramework($generatorForm->framework);
-            $generatorParams->setDataTables($generatorForm->dataTables);
 
             $createTableDtos = [];
             $insertDataDtos = [];

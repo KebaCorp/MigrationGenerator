@@ -45,6 +45,8 @@ class Yii2TableGenerator implements GeneratorInterface
      */
     public function getFileContent(): string
     {
+        $createTableQuery = addcslashes($this->_createTableDto->createTableQuery, '"');
+
         $fileContent = <<<MIGRATION
 <?php
 
@@ -68,7 +70,7 @@ class {$this->getFileName()} extends Migration
     public function safeUp()
     {
         try {
-            Yii::\$app->db->createCommand("{$this->_createTableDto->createTableQuery}")->execute();
+            Yii::\$app->db->createCommand("{$createTableQuery}")->execute();
         } catch (\Exception \$e) {
             echo \$e->getTraceAsString();
             return false;

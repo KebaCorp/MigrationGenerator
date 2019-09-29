@@ -28,7 +28,7 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'dbCharset')->hiddenInput()->label(false) ?>
 
   <div class="form-group">
-      <?= Html::submitButton(Yii::t('generator', 'Generate'), ['class' => 'btn btn-primary']) ?>
+      <?= Html::submitButton(Yii::t('generator', 'Generate'), ['class' => 'btn btn-success']) ?>
   </div>
 
     <?php ActiveForm::end(); ?>

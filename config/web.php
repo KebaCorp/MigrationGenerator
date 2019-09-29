@@ -4,7 +4,9 @@ $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
 $config = [
-    'id'         => env('APP_ID', 'kebacorp/migrationgenerator'),
+    'id'         => env('APP_ID', 'migrationgenerator'),
+    'name'       => env('APP_NAME', 'Migration Generator'),
+    'language'   => env('APP_LANGUAGE', 'ru'),
     'basePath'   => dirname(__DIR__),
     'bootstrap'  => ['log'],
     'aliases'    => [
@@ -46,6 +48,13 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName'  => false,
             'rules'           => [
+            ],
+        ],
+        'i18n'         => [
+            'translations' => [
+                '*' => [
+                    'class' => yii\i18n\PhpMessageSource::class,
+                ],
             ],
         ],
     ],

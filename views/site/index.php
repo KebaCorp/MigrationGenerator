@@ -1,15 +1,26 @@
 <?php
 
-/* @var $this yii\web\View */
+use yii\widgets\ActiveForm;
 
-$this->title = 'Migration Generator';
+/* @var $this yii\web\View */
+/* @var $generatorForm app\models\GeneratorForm */
+/* @var $connectionForm app\models\ConnectionForm */
+/* @var $form ActiveForm */
 
 ?>
 
 <div class="site-index">
 
-  <div class="jumbotron">
-    <h1>Migration Generator</h1>
-  </div>
+    <?php
+
+    if ($connectionForm) {
+        echo $this->render('_connection-form', ['model' => $connectionForm]);
+    }
+
+    if ($generatorForm) {
+        echo $this->render('_generator-form', ['model' => $generatorForm]);
+    }
+
+    ?>
 
 </div>

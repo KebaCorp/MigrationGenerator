@@ -2,13 +2,16 @@
 
 namespace app\controllers;
 
+use app\models\ConnectionForm;
 use app\models\CreateTableDto;
+use app\models\GeneratorForm;
 use app\models\GeneratorParams;
 use app\models\InsertDataDto;
 use app\models\mysql\MigrationGenerator;
 use Exception;
 use PDO;
-use Yii\db\Connection;
+use Yii;
+use yii\db\Connection;
 use yii\web\Controller;
 
 /**
@@ -19,67 +22,88 @@ use yii\web\Controller;
 class SiteController extends Controller
 {
     /**
-     * Generates migrations.
+     * Connect to database.
      *
      * @return string
      * @throws Exception
      */
     public function actionIndex()
     {
-        // Generator params
-        $generatorParams = new GeneratorParams();
-        $generatorParams->setDirectory('../migrations2');
-        $generatorParams->setFramework(GeneratorParams::FRAMEWORK_YII_1);
-        $generatorParams->setDataTables([
-            'feedback_type',
-        ]);
+        $connectionForm = new ConnectionForm();
 
-        // Database connection params
-        $dbHost = 'mysql';
-        $dbPort = '3309';
-        $dbName = 'db_mysql_00000000_migration_generator_local';
-        $dbUser = 'root';
-        $dbPassword = 'rootexample';
-        $dbCharset = 'utf8';
+        if (Yii::$app->request->isPost && $connectionForm->load(Yii::$app->request->post()) && $connectionForm->validate()) {
 
-        $db = new Connection([
-            'dsn'      => "mysql:host={$dbHost};dbname={$dbName}",
-            'username' => $dbUser,
-            'password' => $dbPassword,
-            'charset'  => $dbCharset,
-        ]);
+            $generatorForm = new GeneratorForm();
+            $generatorForm->attributes = $connectionForm->attributes;
 
-        if ($tables = $db->createCommand('SHOW TABLES')->queryAll(PDO::FETCH_COLUMN)) {
+            // Database connection
+            $db = $generatorForm->getDbConnection();
+
+            if ($tables = $db->createCommand('SHOW TABLES')->queryAll(PDO::FETCH_COLUMN)) {
+                $associativeTables = array_combine($tables, $tables);
+                $generatorForm->tables = $tables;
+                $generatorForm->tablesList = $associativeTables;
+                $generatorForm->dataTablesList = $associativeTables;
+            }
+
+            return $this->render('generator-form', ['model' => $generatorForm, 'connectionForm' => $connectionForm]);
+        }
+
+        return $this->render('index', ['connectionForm' => $connectionForm]);
+    }
+
+    /**
+     * Generates migrations.
+     *
+     * @return string|\yii\web\Response
+     * @throws \yii\db\Exception
+     */
+    public function actionGenerate()
+    {
+        $generatorForm = new GeneratorForm();
+
+        if ($generatorForm->load(Yii::$app->request->post()) && $generatorForm->validate()) {
+
+            $db = $generatorForm->getDbConnection();
+
+            // Generator params
+            $generatorParams = new GeneratorParams();
+            $generatorParams->setDirectory($generatorForm->directory);
+            $generatorParams->setFramework($generatorForm->framework);
+            $generatorParams->setDataTables($generatorForm->dataTables);
+
             $createTableDtos = [];
             $insertDataDtos = [];
 
-            foreach ($tables as $table) {
-                $createTableDto = new CreateTableDto();
+            foreach ($generatorForm->tables as $table) {
                 if ($createTable = $db->createCommand("SHOW CREATE TABLE $table")->queryAll()) {
 
+                    $createTableDto = new CreateTableDto();
                     $createTableDto->tableName = $createTable[0]['Table'];
                     $createTableDto->createTableQuery = $createTable[0]['Create Table'];
 
                     $createTableDtos[] = $createTableDto;
                 }
+            }
 
-                if (in_array($table, $generatorParams->getDataTables())) {
-                    if ($data = $this->getDataFromTable($db, $table)) {
+            foreach ($generatorForm->dataTables as $table) {
+                if ($data = $this->_getDataFromTable($db, $table)) {
 
-                        $insertDataDto = new InsertDataDto();
-                        $insertDataDto->tableName = $table;
-                        $insertDataDto->data = $data;
+                    $insertDataDto = new InsertDataDto();
+                    $insertDataDto->tableName = $table;
+                    $insertDataDto->data = $data;
 
-                        $insertDataDtos[] = $insertDataDto;
-                    }
+                    $insertDataDtos[] = $insertDataDto;
                 }
             }
 
             $generator = new MigrationGenerator($generatorParams, $createTableDtos, $insertDataDtos);
             $generator->generate();
+
+            return $this->redirect(['site/index']);
         }
 
-        return $this->render('index');
+        return $this->render('index', ['generatorForm' => $generatorForm]);
     }
 
     /**
@@ -89,7 +113,7 @@ class SiteController extends Controller
      * @param string $table
      * @return array|null
      */
-    public function getDataFromTable(Connection $db, string $table): ?array
+    private function _getDataFromTable(Connection $db, string $table): ?array
     {
         try {
             return $db->createCommand("SELECT * FROM `{$table}`")->queryAll();

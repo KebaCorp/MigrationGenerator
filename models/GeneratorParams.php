@@ -9,8 +9,16 @@ namespace app\models;
  */
 class GeneratorParams
 {
+    /**
+     * Frameworks.
+     */
     const FRAMEWORK_YII_1 = 1;
     const FRAMEWORK_YII_2 = 2;
+
+    /**
+     * Databases.
+     */
+    const DATABASE_MYSQL = 1;
 
     /**
      * @var string

@@ -28,6 +28,13 @@ $config = [
         'db'    => $db,
     ],
     'params'              => $params,
+    'i18n'                => [
+        'translations' => [
+            '*' => [
+                'class' => yii\i18n\PhpMessageSource::class,
+            ],
+        ],
+    ],
 ];
 
 if (YII_ENV_DEV) {
